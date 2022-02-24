@@ -29,6 +29,7 @@ int main(int argc, const char * argv[]) {
     std::vector<Vertex> vertices;
     std::vector<std::vector<Edge>> edges;
     std::vector<std::vector<int>> faces_intermediate;
+    std::vector<Dart> darts;
 
     if (input_file.is_open()) {
       std::string line;
@@ -45,7 +46,7 @@ int main(int argc, const char * argv[]) {
 
         if (word == "f") {
             std::vector<int> face_vertex_indexes;
-            while(iss >> word) face_vertex_indexes.push_back(stoi(word)-1);
+            while(iss >> word) face_vertex_indexes.push_back(stoi(word));
             if (face_vertex_indexes.size() == 4) faces_intermediate.push_back(face_vertex_indexes);
         }
       }
@@ -55,79 +56,49 @@ int main(int argc, const char * argv[]) {
     for (int i = 0; i < faces_intermediate.size(); i++) {
         //std::cout << vertices[faces[i][0]].point << std::endl;
         std::vector<Edge> face_edges;
-        Edge e1 = {edge_id,faces_intermediate[i][0],faces_intermediate[i][1]};
+
+        edge_id++;
+        Edge e1 = {edge_id, faces_intermediate[i][0], faces_intermediate[i][1]};
         face_edges.push_back(e1);
-        edge_id++;
 
-        Edge e2 = {edge_id,faces_intermediate[i][1],faces_intermediate[i][2]};
+
+        edge_id++;
+        Edge e2 = {edge_id, faces_intermediate[i][1], faces_intermediate[i][2]};
         face_edges.push_back(e2);
-        edge_id++;
 
-        Edge e3 = {edge_id,faces_intermediate[i][2],faces_intermediate[i][3]};
+        edge_id++;
+        Edge e3 = {edge_id, faces_intermediate[i][2], faces_intermediate[i][3]};
         face_edges.push_back(e3);
-        edge_id++;
 
-        Edge e4 = {edge_id,faces_intermediate[i][3],faces_intermediate[i][0]};
-        face_edges.push_back(e4);
         edge_id++;
+        Edge e4 = {edge_id, faces_intermediate[i][3], faces_intermediate[i][0]};
+        face_edges.push_back(e4);
+
 
         for (auto e: face_edges) {
-            for (auto v: edges) {
-                if ((e.start_vertex == v[0].start_vertex) && (e.end_vertex == v[0].end_vertex) && (e.id != v[0].id)) {
-                    e.id = v[0].id;
-                    e.start_vertex = v[0].start_vertex;
-                    e.end_vertex = v[0].end_vertex;
-                } else if ((e.start_vertex == v[0].end_vertex) && (e.end_vertex == v[0].start_vertex) && (e.id != v[0].id)) {
-                        e.id = v[0].id;
-                        e.start_vertex = v[0].end_vertex;
-                        e.end_vertex = v[0].start_vertex;
+            for (int v = 0; v < edges.size(); v++) {
+                for (int vi = 0; vi < edges[v].size(); vi++) {
+                    if ((e.start_vertex == edges[v][vi].start_vertex) && (e.end_vertex == edges[v][vi].end_vertex)) {
+                        //std::cout << "Existing edge id: " << edges[v][vi].id << "\t" << "New edge id: " << e.id << std::endl;
+                        e.id = edges[v][vi].id;
+                        //std::cout << "Existing edge id: " << edges[v][vi].id << "\t" << "New edge id: " << e.id << std::endl;
+                        //e.start_vertex = v[0].start_vertex;
+                        //e.end_vertex = v[0].end_vertex;
+                    } else if ((e.start_vertex == edges[v][vi].end_vertex) && (e.end_vertex == edges[v][vi].start_vertex)) {
+                        //std::cout << "Existing edge id: " << edges[v][vi].id << "\t" << "New edge id: " << e.id << std::endl;
+                        e.id = edges[v][vi].id;
+                        //std::cout << "Existing edge id: " << edges[v][vi].id << "\t" << "New edge id: " << e.id << std::endl;
                     }
-                if ((e.start_vertex == v[1].start_vertex) && (e.end_vertex == v[1].end_vertex) && (e.id != v[1].id)) {
-                    e.id = v[1].id;
-                    e.start_vertex = v[1].start_vertex;
-                    e.end_vertex = v[1].end_vertex;
-                } else if ((e.start_vertex == v[1].end_vertex) && (e.end_vertex == v[1].start_vertex) && (e.id != v[1].id)) {
-                        e.id = v[1].id;
-                        e.start_vertex = v[1].end_vertex;
-                        e.end_vertex = v[1].start_vertex;
-                    }
-                if ((e.start_vertex == v[2].start_vertex) && (e.end_vertex == v[2].end_vertex) && (e.id != v[2].id)) {
-                    e.id = v[2].id;
-                    e.start_vertex = v[2].start_vertex;
-                    e.end_vertex = v[2].end_vertex;
-                } else if ((e.start_vertex == v[2].end_vertex) && (e.end_vertex == v[2].start_vertex) && (e.id != v[2].id)) {
-                        e.id = v[2].id;
-                        e.start_vertex = v[2].end_vertex;
-                        e.end_vertex = v[2].start_vertex;
-                }
-                if ((e.start_vertex == v[3].start_vertex) && (e.end_vertex == v[3].end_vertex) && (e.id != v[3].id)) {
-                    e.id = v[3].id;
-                    e.start_vertex = v[3].start_vertex;
-                    e.end_vertex = v[3].end_vertex;
-                } else if ((e.start_vertex == v[3].end_vertex) && (e.end_vertex == v[3].start_vertex) && (e.id != v[3].id)) {
-                        e.id = v[3].id;
-                        e.start_vertex = v[3].end_vertex;
-                        e.end_vertex = v[3].start_vertex;
                 }
             }
         }
         edges.push_back(face_edges);
         face_edges.clear();
-
     }
 
-    /*
-    std::cout << "num_vertices: " << vertices.size() << std::endl;
-    std::cout << "num_edges: " << edges[0].size() << std::endl;
-    std::cout << "num_faces: " << faces_intermediate.size() << std::endl;
-    int q = 1;
-    for (auto v: vertices) {
-        std::cout << v.point << "," << q << std::endl;
-        q++;
-    }
-    for (auto f: faces_intermediate) std::cout << "(" << f[0]+1 << f[1]+1 << f[2]+1 << f[3]+1 << ")" << std::endl;
-    for (auto e: edges) std::cout << "(" << "[" << vertices[e[0].start_vertex].point << "," << vertices[e[0].end_vertex].point << "]" << "," << "[" << vertices[e[1].start_vertex].point << "," << vertices[e[1].end_vertex].point << "]" << "," "[" << vertices[e[2].start_vertex].point << "," << vertices[e[2].end_vertex].point << "]" << "," << "[" << vertices[e[3].start_vertex].point << "," << vertices[e[3].end_vertex].point << "]" << ")" << std::endl;
-    */
+    for (auto f: faces_intermediate) std::cout << "(" << f[0] << f[1] << f[2] << f[3] << ")" << std::endl;
+    for (auto e: edges) std::cout << "(" << "[" << e[0].start_vertex << "," << e[0].end_vertex << "]" << "," << "[" << e[1].start_vertex << "," << e[1].end_vertex << "]" << "," "[" << e[2].start_vertex << "," << e[2].end_vertex << "]" << "," << "[" << e[3].start_vertex << "," << e[3].end_vertex << "]" << ")" << std::endl;
+
 
     //  declare faces to store Face objects which model edges, and vertices joining them, bounding each face
     std::vector<Face> faces;
@@ -138,11 +109,16 @@ int main(int argc, const char * argv[]) {
         faces.push_back(f);
     }
 
-    
-
-
-
-
+    bool face_test = true;
+    Face current_face = faces[5];
+    Vertex current_vertex = vertices[current_face.node_list[0]];
+    Edge current_edge = current_face.edge_list[3];
+    //std::cout << current_edge.id;
+    int t = 0;
+    while (face_test) {
+       //std::cout << starting_face.id << std::endl;
+       face_test = false;
+    }
 
   
   // ## Output generalised map to CSV ##
