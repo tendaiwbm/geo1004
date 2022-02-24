@@ -52,15 +52,14 @@ int main(int argc, const char * argv[]) {
       }
     }
 
+    /* Organise edges per face in std::vector<Edge> edges */
     int edge_id = 0;
     for (int i = 0; i < faces_intermediate.size(); i++) {
-        //std::cout << vertices[faces[i][0]].point << std::endl;
         std::vector<Edge> face_edges;
 
         edge_id++;
         Edge e1 = {edge_id, faces_intermediate[i][0], faces_intermediate[i][1]};
         face_edges.push_back(e1);
-
 
         edge_id++;
         Edge e2 = {edge_id, faces_intermediate[i][1], faces_intermediate[i][2]};
@@ -94,7 +93,8 @@ int main(int argc, const char * argv[]) {
         face_edges.clear();
     }
 
-    //  declare faces to store Face objects which model edges, and vertices joining them, bounding each face
+    /*  std::vector<Face> faces stores Face objects with their edges and vertices, ordered as in faces_intermediate
+     *  faces_intermediate stores the indices of the vertices of each face as read in std::vector<Vertex> vertices */
     std::vector<Face> faces;
     for (int i = 0; i < faces_intermediate.size(); i++) {
         //std::cout << "(" << faces_intermediate[i][0]+1 << "," << faces_intermediate[i][1]+1 << "," << faces_intermediate[i][2]+1 << "," << faces_intermediate[i][3]+1 << ")" << std::endl;
@@ -103,6 +103,10 @@ int main(int argc, const char * argv[]) {
         faces.push_back(f);
     }
 
+    /* access every edge belonging to each face and create two darts on it
+     * do this face by face
+     * on every edge, its two vertices are each other's alpha0
+     * find alpha1 for each dart by finding an edge in the same face whose end_vertex is the same as the 0-cell of the dart */
     int t = 1;
     for (int face_index = 0; face_index < faces.size(); face_index++) {
         for (int edge_index = 0; edge_index < faces[1].edge_list.size(); edge_index++) {
@@ -136,9 +140,10 @@ int main(int argc, const char * argv[]) {
                 }
             }
             //std::cout << d1.dart_id << "\tv:" << d1.vertex_index << "\te:" << d1.edge_id << "\tf:" << d1.face_id << "\ta0:" << d1.alpha0 << "\ta1:" << d1.alpha1 << std::endl;
-            //std::cout << d2.dart_id << "\tv:" << d2.vertex_index << "\te:" << d2.edge_id << "\tf:" << d2.face_id << "\ta0:" << d2.alpha0 << "\ta1:" << d2.alpha1 << std::endl;
         }
     }
+
+    /* find alpha 2 for every dart by searching for another dart in any other face, with the same 0-cell and 1-cell */
     for (int dart_index = 0; dart_index < darts.size(); dart_index++) {
         for (auto other_dart: darts) {
             if ((darts[dart_index].vertex_index == other_dart.vertex_index) && (darts[dart_index].edge_id == other_dart.edge_id) && (darts[dart_index].face_id != other_dart.face_id)) {
@@ -148,10 +153,7 @@ int main(int argc, const char * argv[]) {
             }
         }
     }
-    for (int dart_index = 0; dart_index < darts.size(); dart_index++)
-        std::cout << darts[dart_index].dart_id << "\tvertex:" << darts[dart_index].vertex_index << "\tedge:" << darts[dart_index].edge_id <<
-        "\t\tface:" << darts[dart_index].face_id << "\t\talpha0:" << darts[dart_index].alpha0 << "\talpha1:" << darts[dart_index].alpha1 <<
-        "\talpha2:" << darts[dart_index].alpha2 << std::endl;
+
 
 
 
