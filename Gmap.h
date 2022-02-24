@@ -36,6 +36,10 @@ Then you could create and link Darts like:
 */
 
 struct Dart {
+    int dart_id;
+    int vertex_id;
+    int edge_id;
+    int face_id;
 
   // involutions:
   // ..
