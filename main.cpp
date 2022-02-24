@@ -94,8 +94,6 @@ int main(int argc, const char * argv[]) {
         face_edges.clear();
     }
 
-    //for (auto e: edges) std::cout << "(" << e[0].id << "," << e[1].id << ","  << e[2].id << "," << e[3].id << ")" << std::endl;
-
     //  declare faces to store Face objects which model edges, and vertices joining them, bounding each face
     std::vector<Face> faces;
     for (int i = 0; i < faces_intermediate.size(); i++) {
@@ -105,9 +103,6 @@ int main(int argc, const char * argv[]) {
         faces.push_back(f);
     }
 
-    //for (auto f: faces) std::cout << "(" << f.node_list[0] << f.node_list[1] << f.node_list[2] << f.node_list[3] << ")" << std::endl;
-
-    bool face_test = true;
     int t = 1;
     for (int face_index = 0; face_index < faces.size(); face_index++) {
         for (int edge_index = 0; edge_index < faces[1].edge_list.size(); edge_index++) {
@@ -140,12 +135,23 @@ int main(int argc, const char * argv[]) {
                     darts.push_back(d2);
                 }
             }
-            std::cout << d1.dart_id << "\tv:" << d1.vertex_index << "\te:" << d1.edge_id << "\tf:" << d1.face_id << "\ta0:" << d1.alpha0 << "\ta1:" << d1.alpha1 << std::endl;
-            std::cout << d2.dart_id << "\tv:" << d2.vertex_index << "\te:" << d2.edge_id << "\tf:" << d2.face_id << "\ta0:" << d2.alpha0 << "\ta1:" << d2.alpha1 << std::endl;
-
+            //std::cout << d1.dart_id << "\tv:" << d1.vertex_index << "\te:" << d1.edge_id << "\tf:" << d1.face_id << "\ta0:" << d1.alpha0 << "\ta1:" << d1.alpha1 << std::endl;
+            //std::cout << d2.dart_id << "\tv:" << d2.vertex_index << "\te:" << d2.edge_id << "\tf:" << d2.face_id << "\ta0:" << d2.alpha0 << "\ta1:" << d2.alpha1 << std::endl;
         }
     }
-
+    for (int dart_index = 0; dart_index < darts.size(); dart_index++) {
+        for (auto other_dart: darts) {
+            if ((darts[dart_index].vertex_index == other_dart.vertex_index) && (darts[dart_index].edge_id == other_dart.edge_id) && (darts[dart_index].face_id != other_dart.face_id)) {
+                //std::cout << darts[dart_index].dart_id << "\tv:" << darts[dart_index].vertex_index << "\te:" << darts[dart_index].edge_id << "\tf:" << darts[dart_index].face_id << "\ta0:" << darts[dart_index].alpha0 << "\ta1:" << darts[dart_index].alpha1 << std::endl;
+                //std::cout << other_dart.dart_id << "\tv:" << other_dart.vertex_index << "\te:" << other_dart.edge_id << "\tf:" << other_dart.face_id << "\ta0:" << other_dart.alpha0 << "\ta1:" << other_dart.alpha1 << std::endl;
+                darts[dart_index].alpha2 = other_dart.face_id;
+            }
+        }
+    }
+    for (int dart_index = 0; dart_index < darts.size(); dart_index++)
+        std::cout << darts[dart_index].dart_id << "\tvertex:" << darts[dart_index].vertex_index << "\tedge:" << darts[dart_index].edge_id <<
+        "\t\tface:" << darts[dart_index].face_id << "\t\talpha0:" << darts[dart_index].alpha0 << "\talpha1:" << darts[dart_index].alpha1 <<
+        "\talpha2:" << darts[dart_index].alpha2 << std::endl;
 
 
 
